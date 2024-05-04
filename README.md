@@ -2,4 +2,4 @@
 
 Jetpack Compose 与 贝塞尔曲线 的结合使用
 
-![](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/7b6aaf38932043ea8cf54f2402b5e3fa~tplv-k3u1fbpfcp-zoom-1.image)
+![](https://github.com/leavesCZY/ComposeWaveLoading/assets/30774063/6b3939b9-2cce-4e6d-9a1d-eca92273fab7)
