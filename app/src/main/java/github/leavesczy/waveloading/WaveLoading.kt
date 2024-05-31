@@ -1,6 +1,5 @@
 package github.leavesczy.waveloading
 
-import android.graphics.Typeface
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.InfiniteRepeatableSpec
 import androidx.compose.animation.core.RepeatMode
@@ -13,20 +12,22 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.clipPath
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 
 /**
@@ -44,8 +45,8 @@ fun WaveLoading(
     downTextColor: Color = Color.White,
     animationSpec: InfiniteRepeatableSpec<Float> = infiniteRepeatable(
         animation = tween(
-            durationMillis = 500,
-            easing = CubicBezierEasing(0.2f, 0.2f, 0.7f, 0.9f)
+            durationMillis = 600,
+            easing = CubicBezierEasing(0.111f, 0.333f, 0.777f, 0.888f)
         ),
         repeatMode = RepeatMode.Restart
     )
@@ -56,24 +57,16 @@ fun WaveLoading(
         val circleSizePx = circleSizeDp.value * density
         val waveWidth = circleSizePx / 1.2f
         val waveHeight = circleSizePx / 10f
-        val textPaint by remember {
-            mutableStateOf(Paint().asFrameworkPaint().apply {
-                isAntiAlias = true
-                isDither = true
-                typeface = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD)
-                textAlign = android.graphics.Paint.Align.CENTER
-            })
+        val wavePath = remember {
+            Path()
         }
-        val wavePath by remember {
-            mutableStateOf(Path())
-        }
-        val circlePath by remember {
-            mutableStateOf(Path().apply {
+        val circlePath = remember {
+            Path().apply {
                 addArc(
                     Rect(0f, 0f, circleSizePx, circleSizePx),
                     0f, 360f
                 )
-            })
+            }
         }
         val animateValue by rememberInfiniteTransition(label = "").animateFloat(
             initialValue = 0f,
@@ -81,15 +74,19 @@ fun WaveLoading(
             animationSpec = animationSpec,
             label = "",
         )
-        Canvas(modifier = modifier.requiredSize(size = circleSizeDp)) {
+        val textMeasurer = rememberTextMeasurer()
+        Canvas(
+            modifier = modifier
+                .requiredSize(size = circleSizeDp)
+        ) {
             drawTextToCenter(
+                textMeasurer = textMeasurer,
                 text = text,
-                textPaint = textPaint,
-                textSize = textSize.toPx(),
-                textColor = waveColor.toArgb()
+                textSize = textSize,
+                textColor = waveColor
             )
             wavePath.reset()
-            wavePath.moveTo(-waveWidth + animateValue, circleSizePx / 2.3f)
+            wavePath.moveTo(-waveWidth + animateValue, circleSizePx / 2.2f)
             var i = -waveWidth
             while (i < circleSizePx + waveWidth) {
                 wavePath.relativeQuadraticBezierTo(waveWidth / 4f, -waveHeight, waveWidth / 2f, 0f)
@@ -107,10 +104,10 @@ fun WaveLoading(
             drawPath(path = resultPath, color = waveColor)
             clipPath(path = resultPath, clipOp = ClipOp.Intersect) {
                 drawTextToCenter(
+                    textMeasurer = textMeasurer,
                     text = text,
-                    textPaint = textPaint,
-                    textSize = textSize.toPx(),
-                    textColor = downTextColor.toArgb()
+                    textSize = textSize,
+                    textColor = downTextColor
                 )
             }
         }
@@ -118,15 +115,24 @@ fun WaveLoading(
 }
 
 private fun DrawScope.drawTextToCenter(
+    textMeasurer: TextMeasurer,
     text: String,
-    textPaint: android.graphics.Paint,
-    textSize: Float,
-    textColor: Int
+    textSize: TextUnit,
+    textColor: Color
 ) {
-    textPaint.textSize = textSize
-    textPaint.color = textColor
-    val fontMetrics = textPaint.fontMetrics
-    val x = size.width / 2f
-    val y = size.height / 2f - (fontMetrics.top + fontMetrics.bottom) / 2f
-    drawContext.canvas.nativeCanvas.drawText(text, x, y, textPaint)
+    val textLayoutResult = textMeasurer.measure(
+        text = text,
+        style = TextStyle(
+            color = textColor,
+            fontSize = textSize,
+            textAlign = TextAlign.Center
+        )
+    )
+    drawText(
+        textLayoutResult = textLayoutResult,
+        topLeft = Offset(
+            x = (size.width - textLayoutResult.size.width) / 2,
+            y = (size.height - textLayoutResult.size.height) / 2
+        )
+    )
 }

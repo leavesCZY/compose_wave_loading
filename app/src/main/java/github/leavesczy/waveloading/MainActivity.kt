@@ -43,43 +43,38 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Column(
                             modifier = Modifier
-                                .verticalScroll(state = rememberScrollState()),
+                                .fillMaxSize()
+                                .verticalScroll(state = rememberScrollState())
+                                .padding(vertical = 20.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             WaveLoading(
                                 modifier = Modifier
                                     .size(size = 220.dp),
-                                text = "開",
+                                text = "花",
                                 textSize = 150.sp,
                                 waveColor = Color(0xFF3949AB)
                             )
                             WaveLoading(
                                 modifier = Modifier
                                     .size(size = 220.dp),
-                                text = "心",
+                                text = "里",
                                 textSize = 150.sp,
                                 waveColor = Color(0xFF00897B)
                             )
                             WaveLoading(
                                 modifier = Modifier
                                     .size(size = 220.dp),
-                                text = "最",
+                                text = "胡",
                                 textSize = 150.sp,
                                 waveColor = Color(0xFF29B6F6)
                             )
                             WaveLoading(
                                 modifier = Modifier
                                     .size(size = 220.dp),
-                                text = "重",
+                                text = "哨",
                                 textSize = 150.sp,
                                 waveColor = Color(0xFFFFA726)
-                            )
-                            WaveLoading(
-                                modifier = Modifier
-                                    .size(size = 220.dp),
-                                text = "要",
-                                textSize = 150.sp,
-                                waveColor = Color(0xFFFF7043)
                             )
                         }
                     }
